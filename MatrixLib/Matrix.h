@@ -4,23 +4,22 @@
 
 const int MAX_MATRIX_SIZE = 100000;
 
-
 template <class ValType>
 class TMatrix : public TVector<TVector<ValType> >
 {
 private:
 	int mSize;
 public:
-	TMatrix(int s);
-	TMatrix(const TMatrix& mt);                   
+	TMatrix(int s = 10);
+	TMatrix(const TMatrix& mt);                    
 	TMatrix(const TVector<TVector<ValType> >& mt); 
 	~TMatrix();
 
 	int GetSize() { return mSize; }; 
-	bool operator==(const TMatrix& mt) const;     
-	TMatrix& operator= (const TMatrix& mt);       
-	TMatrix  operator+ (const TMatrix& mt);       
-	TMatrix  operator- (const TMatrix& mt);       
+	bool operator==(const TMatrix& mt) const;      
+	TMatrix& operator= (const TMatrix& mt);        
+	TMatrix  operator+ (const TMatrix& mt);        
+	TMatrix  operator- (const TMatrix& mt);        
 	TMatrix  operator* (const TMatrix& mt);        
 
 	
@@ -50,6 +49,12 @@ inline TMatrix<ValType>::TMatrix(int s) : TVector<TVector <ValType> >(s)
 		throw "Error";
 	}
 	mSize = s;
+
+	for (int i = 0; i < s; i++)
+	{
+		this->pVector[i] = TVector<ValType>(s - i);
+	}
+
 }
 
 template <class ValType> 
@@ -66,6 +71,10 @@ inline TMatrix<ValType>::TMatrix(const TVector<TVector<ValType> >& mt) : TVector
 template<class ValType>
 inline TMatrix<ValType>::~TMatrix()
 {
+	if (mSize != 0)
+	{
+		mSize = NULL;
+	}
 }
 
 template <class ValType> 
@@ -149,12 +158,27 @@ inline TMatrix<ValType> TMatrix<ValType>::operator*(const TMatrix& mt)
 	{
 		throw "Error";
 	}
+
 	TMatrix<ValType> tmp(*this);
-	for (int i = 0; i < this->Size; i++)
+	TMatrix<ValType> res(this->Size);
+
+	int row = this->Size;
+	int col = this->Size;
+
+
+	for (int i = 0; i < row; i++)
 	{
-		tmp.pVector[i] = tmp.pVector[i] * mt.pVector[i];
+		for (int j = 0; j < col; j++)
+		{
+			res.pVector[i][j] = 0;
+			for (int k = 0; k < col; k++)
+			{
+				res.pVector[i][j] += (tmp.pVector[i][k] * mt.pVector[k][j]);
+			}
+			col--;
+		}
 	}
-	return tmp;
+	return res;
 }
 
 #endif 
